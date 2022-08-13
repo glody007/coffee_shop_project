@@ -21,12 +21,11 @@ CORS(app)
 
 # ROUTES
 '''
-implement endpoint
-    GET /drinks
-        it should be a public endpoint
-        it should contain only the drink.short() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+GET /drinks
+    it should be a public endpoint
+    it should contain only the drink.short() data representation
+returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
+    or appropriate status code indicating reason for failure
 '''
 @app.route("/drinks")
 def retrieve_drinks():
@@ -41,13 +40,22 @@ def retrieve_drinks():
 
 
 '''
-@TODO implement endpoint
-    GET /drinks-detail
-        it should require the 'get:drinks-detail' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+GET /drinks-detail
+    it should require the 'get:drinks-detail' permission
+    it should contain the drink.long() data representation
+returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
+    or appropriate status code indicating reason for failure
 '''
+@app.route("/drinks-detail")
+def retrieve_drinks_detail():
+    drinks = Drink.query.all()
+
+    return jsonify(
+        {
+            "success": True,
+            "drinks": [drink.long() for drink in drinks],
+        }
+    )
 
 
 '''
