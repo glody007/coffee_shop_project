@@ -213,6 +213,6 @@ def unprocessable(error):
 implement error handler for AuthError
 error handler should conform to general task above
 '''
-@app.errorhandler(401)
+@app.errorhandler(AuthError)
 def unauthorized(error):
-    return jsonify({"success": False, "error": error.code, "message": error.description}), error.code
+    return jsonify({"success": False, "error": error.args[1], "message": error.args[0]["description"]}), error.args[1]
