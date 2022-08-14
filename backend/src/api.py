@@ -47,6 +47,7 @@ returns status code 200 and json {"success": True, "drinks": drinks} where drink
     or appropriate status code indicating reason for failure
 '''
 @app.route("/drinks-detail")
+@requires_auth("get:drinks-detail")
 def retrieve_drinks_detail():
     drinks = Drink.query.all()
 
@@ -67,6 +68,7 @@ returns status code 200 and json {"success": True, "drinks": drink} where drink 
     or appropriate status code indicating reason for failure
 '''
 @app.route("/drinks", methods=["POST"])
+@requires_auth("post:drinks")
 def create_drink():
     body = request.get_json()
 
@@ -103,6 +105,7 @@ returns status code 200 and json {"success": True, "drinks": drink} where drink 
     or appropriate status code indicating reason for failure
 '''
 @app.route("/drinks/<int:drink_id>", methods=["PATCH"])
+@requires_auth("patch:drinks")
 def patch_drink(drink_id):
     try:
         body = request.get_json()
@@ -144,6 +147,7 @@ returns status code 200 and json {"success": True, "delete": id} where id is the
     or appropriate status code indicating reason for failure
 '''
 @app.route("/drinks/<int:drink_id>", methods=["DELETE"])
+@requires_auth("delete:drinks")
 def delete_drink(drink_id):
     try:
         drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
@@ -166,7 +170,7 @@ def delete_drink(drink_id):
 
 # Error Handling
 '''
-Example error handling for unprocessable entity
+error handling for unprocessable entity
 '''
 
 
@@ -196,6 +200,13 @@ def unprocessable(error):
     return (
         jsonify({"success": False, "error": 422, "message": "unprocessable"}),
         422,
+    )
+
+@app.errorhandler(403)
+def unprocessable(error):
+    return (
+        jsonify({"success": False, "error": error.code, "message": error.description}),
+        error.code,
     )
 
 '''
