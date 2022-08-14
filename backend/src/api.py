@@ -78,7 +78,7 @@ def create_drink():
         if (title == "" or recipe == ""):
             abort(422)
 
-        drink = Drink(title=title, recipe=json.dumps([recipe]))
+        drink = Drink(title=title, recipe=json.dumps(recipe))
         drink.insert()
 
         return jsonify(
@@ -119,7 +119,7 @@ def patch_drink(drink_id):
             drink.title = title
         
         if recipe != "":
-            drink.recipe = json.dumps([recipe])
+            drink.recipe = json.dumps(recipe)
 
         drink.update()
 
