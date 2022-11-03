@@ -36,7 +36,8 @@ def db_drop_and_create_all():
     # add one demo row which is helping in POSTMAN test
     recycler = Recycler(
         title='Demo',
-        position='Salama'
+        position='Salama',
+
     )
 
 
@@ -56,6 +57,14 @@ class Recycler(db.Model):
     title = Column(String(80), unique=True)
     # String position
     position = Column(String(180), nullable=False)
+    # Bio Level
+    bio_level = Column(Integer(), default=0)
+    # Metal Level
+    metal_level = Column(Integer(), default=0)
+    # Plastic Level
+    plastic_level = Column(Integer(), default=0)
+    # Unknow Level
+    unknow_level = Column(Integer(), default=0)
 
     '''
     short()
@@ -78,7 +87,11 @@ class Recycler(db.Model):
         return {
             'id': self.id,
             'title': self.title,
-            'position': self.position
+            'position': self.position,
+            'bio_level': self.bio_level,
+            'metal_level': self.metal_level,
+            'plastic_level': self.plastic_level,
+            'unknow_level':  self.unknow_level
         }
 
     '''
