@@ -34,53 +34,51 @@ def db_drop_and_create_all():
     db.drop_all()
     db.create_all()
     # add one demo row which is helping in POSTMAN test
-    drink = Drink(
-        title='water',
-        recipe='[{"name": "water", "color": "blue", "parts": 1}]'
+    recycler = Recycler(
+        title='Demo',
+        position='Salama'
     )
 
 
-    drink.insert()
+    recycler.insert()
 # ROUTES
 
 '''
-Drink
-a persistent drink entity, extends the base SQLAlchemy Model
+Recycler
+a persistent recycler entity, extends the base SQLAlchemy Model
 '''
 
 
-class Drink(db.Model):
+class Recycler(db.Model):
     # Autoincrementing, unique primary key
     id = Column(Integer().with_variant(Integer, "sqlite"), primary_key=True)
     # String Title
     title = Column(String(80), unique=True)
-    # the ingredients blob - this stores a lazy json blob
-    # the required datatype is [{'color': string, 'name':string, 'parts':number}]
-    recipe = Column(String(180), nullable=False)
+    # String position
+    position = Column(String(180), nullable=False)
 
     '''
     short()
-        short form representation of the Drink model
+        short form representation of the Recycler model
     '''
 
     def short(self):
-        short_recipe = [{'color': r['color'], 'parts': r['parts']} for r in json.loads(self.recipe)]
         return {
             'id': self.id,
             'title': self.title,
-            'recipe': short_recipe
+            'position': self.position
         }
 
     '''
     long()
-        long form representation of the Drink model
+        long form representation of the Recycler model
     '''
 
     def long(self):
         return {
             'id': self.id,
             'title': self.title,
-            'recipe': json.loads(self.recipe)
+            'position': self.position
         }
 
     '''
@@ -89,8 +87,8 @@ class Drink(db.Model):
         the model must have a unique name
         the model must have a unique id or null id
         EXAMPLE
-            drink = Drink(title=req_title, recipe=req_recipe)
-            drink.insert()
+            recycler = Recycler(title=req_title, recipe=req_recipe)
+            recycler.insert()
     '''
 
     def insert(self):
@@ -102,8 +100,8 @@ class Drink(db.Model):
         deletes a new model into a database
         the model must exist in the database
         EXAMPLE
-            drink = Drink(title=req_title, recipe=req_recipe)
-            drink.delete()
+            recycler = Recycler(title=req_title, recipe=req_recipe)
+            recycler.delete()
     '''
 
     def delete(self):
@@ -115,9 +113,9 @@ class Drink(db.Model):
         updates a new model into a database
         the model must exist in the database
         EXAMPLE
-            drink = Drink.query.filter(Drink.id == id).one_or_none()
-            drink.title = 'Black Coffee'
-            drink.update()
+            recycler = Recycler.query.filter(Recycler.id == id).one_or_none()
+            recycler.title = 'Black Coffee'
+            recycler.update()
     '''
 
     def update(self):

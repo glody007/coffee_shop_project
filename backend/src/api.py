@@ -4,7 +4,7 @@ from sqlalchemy import exc
 import json
 from flask_cors import CORS
 
-from .database.models import db_drop_and_create_all, setup_db, Drink
+from .database.models import db_drop_and_create_all, setup_db, Recycler
 from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
@@ -21,72 +21,70 @@ CORS(app)
 
 # ROUTES
 '''
-GET /drinks
+GET /recyclers
     it should be a public endpoint
-    it should contain only the drink.short() data representation
-returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
+    it should contain only the recycler.short() data representation
+returns status code 200 and json {"success": True, "recyclers": recyclers} where recyclers is the list of recyclers
     or appropriate status code indicating reason for failure
 '''
-@app.route("/drinks")
-def retrieve_drinks():
-    drinks = Drink.query.all()
+@app.route("/recyclers")
+def retrieve_recyclers():
+    recyclers = Recycler.query.all()
 
     return jsonify(
         {
             "success": True,
-            "drinks": [drink.short() for drink in drinks],
+            "recyclers": [recycler.short() for recycler in recyclers],
         }
     )
 
 
 '''
-GET /drinks-detail
-    it should require the 'get:drinks-detail' permission
-    it should contain the drink.long() data representation
-returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
+GET /recyclers-detail
+    it should require the 'get:recyclers-detail' permission
+    it should contain the recycler.long() data representation
+returns status code 200 and json {"success": True, "recyclers": recyclers} where recyclers is the list of recyclers
     or appropriate status code indicating reason for failure
 '''
-@app.route("/drinks-detail")
-@requires_auth("get:drinks-detail")
-def retrieve_drinks_detail():
-    drinks = Drink.query.all()
+@app.route("/recyclers-detail")
+def retrieve_recyclers_detail():
+    recyclers = Recycler.query.all()
 
     return jsonify(
         {
             "success": True,
-            "drinks": [drink.long() for drink in drinks],
+            "recyclers": [recycler.long() for recycler in recyclers],
         }
     )
 
 
 '''
-POST /drinks
-    it should create a new row in the drinks table
-    it should require the 'post:drinks' permission
-    it should contain the drink.long() data representation
-returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
+POST /recyclers
+    it should create a new row in the recyclers table
+    it should require the 'post:recyclers' permission
+    it should contain the recycler.long() data representation
+returns status code 200 and json {"success": True, "recyclers": recycler} where recycler an array containing only the newly created recycler
     or appropriate status code indicating reason for failure
 '''
-@app.route("/drinks", methods=["POST"])
-@requires_auth("post:drinks")
-def create_drink():
+@app.route("/recyclers", methods=["POST"])
+def create_recycler():
     body = request.get_json()
 
     title = body.get("title", "")
-    recipe = body.get("recipe", "")
+    position = body.get("position", "")
 
     try:
 
-        if (title == "" or recipe == ""):
+        if (title == "" or position == ""):
             abort(422)
 
-        drink = Drink(title=title, recipe=json.dumps(recipe))
-        drink.insert()
+        recycler = Recycler(title=title, position=position)
+        recycler.insert()
 
         return jsonify(
             {
                 "success": True,
-                "drinks": [drink.long()],
+                "recyclers": [recycler.long()],
             }
         )
 
@@ -95,41 +93,40 @@ def create_drink():
 
 
 '''
-PATCH /drinks/<id>
+PATCH /recyclers/<id>
     where <id> is the existing model id
     it should respond with a 404 error if <id> is not found
     it should update the corresponding row for <id>
-    it should require the 'patch:drinks' permission
-    it should contain the drink.long() data representation
-returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
+    it should require the 'patch:recyclers' permission
+    it should contain the recycler.long() data representation
+returns status code 200 and json {"success": True, "recyclers": recycler} where recycler an array containing only the updated recycler
     or appropriate status code indicating reason for failure
 '''
-@app.route("/drinks/<int:drink_id>", methods=["PATCH"])
-@requires_auth("patch:drinks")
-def patch_drink(drink_id):
+@app.route("/recyclers/<int:recycler_id>", methods=["PATCH"])
+def patch_recycler(recycler_id):
     try:
         body = request.get_json()
 
         title = body.get("title", "")
-        recipe = body.get("recipe", "")
+        position = body.get("position", "")
 
-        drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+        recycler = Recycler.query.filter(Recycler.id == recycler_id).one_or_none()
 
-        if drink is None:
+        if recycler is None:
             abort(404)
 
         if title != "":
-            drink.title = title
+            recycler.title = title
         
-        if recipe != "":
-            drink.recipe = json.dumps(recipe)
+        if position != "":
+            recycler.position = position
 
-        drink.update()
+        recycler.update()
 
         return jsonify(
             {
                 "success": True,
-                "drinks": [drink.long()],
+                "recyclers": [recycler.long()],
             }
         )
 
@@ -138,29 +135,28 @@ def patch_drink(drink_id):
 
 
 '''
-DELETE /drinks/<id>
+DELETE /recyclers/<id>
     where <id> is the existing model id
     it should respond with a 404 error if <id> is not found
     it should delete the corresponding row for <id>
-    it should require the 'delete:drinks' permission
+    it should require the 'delete:recyclers' permission
 returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
     or appropriate status code indicating reason for failure
 '''
-@app.route("/drinks/<int:drink_id>", methods=["DELETE"])
-@requires_auth("delete:drinks")
-def delete_drink(drink_id):
+@app.route("/recyclers/<int:recycler_id>", methods=["DELETE"])
+def delete_recycler(recycler_id):
     try:
-        drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+        recycler = Recycler.query.filter(Recycler.id == recycler_id).one_or_none()
 
-        if drink is None:
+        if recycler is None:
             abort(404)
 
-        drink.delete()
+        recycler.delete()
 
         return jsonify(
             {
                 "success": True,
-                "delete": drink_id,
+                "delete": recycler_id,
             }
         )
 
